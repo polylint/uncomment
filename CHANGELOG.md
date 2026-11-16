@@ -4,7 +4,22 @@ All notable changes to this project are documented in this file.
 
 This changelog is generated from git tags and commit history.
 
-## [v3.11.0] - 2026-11-03
+## [v3.11.1] - 2026-11-16
+
+3.11.0 was prepared but never published; its changes ship in this release.
+
+### Changed
+
+- uncomment moved to the [polylint](https://github.com/polylint) organization: the repository is now
+  `polylint/uncomment`, so the GitHub Action is `polylint/uncomment@v3`, the pre-commit repo is
+  `https://github.com/polylint/uncomment`, and `uncomment init` writes the schema URL from the new home.
+- The npm packages are now `@polylint/uncomment` (the command is still `uncomment`) and
+  `@polylint/opencode-uncomment`. `uncomment-cli` and `@goldziher/opencode-uncomment` are deprecated.
+- Homebrew moves to the `polylint/tap` tap (`brew install polylint/tap/uncomment`), with bottles for macOS 15+
+  on Apple Silicon and Linux x86_64/arm64. Windows has a Scoop manifest in the `polylint` bucket.
+- Dependencies upgraded to their latest releases, including tree-sitter-language-pack 1.25.2.
+
+## [v3.11.0] - unreleased
 
 ### Added
 

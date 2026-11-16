@@ -1,6 +1,6 @@
 {
   "name": "@polylint/uncomment",
-  "version": "3.11.0",
+  "version": "3.11.1",
   "description": "A fast Rust-based CLI tool for removing comments from source code",
   "bin": {
     "uncomment": "bin/uncomment"
