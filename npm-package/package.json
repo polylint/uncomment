@@ -5,6 +5,7 @@
   "bin": {
     "uncomment": "bin/uncomment"
   },
+  "main": "index.js",
   "scripts": {
     "postinstall": "node install.js"
   },
@@ -37,7 +38,16 @@
     "adm-zip": "^0.6.1",
     "tar": "^7.5.23"
   },
+  "optionalDependencies": {
+    "@polylint/uncomment-darwin-arm64": "3.11.1",
+    "@polylint/uncomment-darwin-x64": "3.11.1",
+    "@polylint/uncomment-linux-arm64-gnu": "3.11.1",
+    "@polylint/uncomment-linux-x64-gnu": "3.11.1",
+    "@polylint/uncomment-win32-x64": "3.11.1"
+  },
   "files": [
+    "README.md",
+    "index.js",
     "install.js",
     "bin/uncomment"
   ],

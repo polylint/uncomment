@@ -131,6 +131,17 @@ jobs:
             exit 1
           fi
 
+          # The npm platform packages and the umbrella's exact optionalDependencies pins.
+          for manifest in npm-package/platforms/*/package.json; do
+            name="$(jq -r '.name' "$manifest")"
+            platform_version="$(jq -r '.version' "$manifest")"
+            pinned="$(jq -r --arg name "$name" '.optionalDependencies[$name] // empty' npm-package/package.json)"
+            if [ "$platform_version" != "$target_version" ] || [ "$pinned" != "$target_version" ]; then
+              echo "::error::$manifest is $platform_version and pinned as '$pinned'; expected $target_version"
+              exit 1
+            fi
+          done
+
           init_version="$(grep -E '^__version__ = "' pip-package/uncomment/__init__.py | cut -d'"' -f2)"
           if [ "$init_version" != "$target_python_version" ]; then
             echo "::error::pip-package/uncomment/__init__.py version mismatch: expected $target_python_version, got $init_version"
@@ -607,6 +618,11 @@ jobs:
     if: >-
       !inputs.plugins-only && (always() && needs.meta.outputs.npm_exists != 'true' && needs.finalize_release.result == 'success')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # npm trusted publishing exchanges this OIDC token for a publish credential;
+      # no NODE_AUTH_TOKEN is used.
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -621,20 +637,75 @@ jobs:
           config-ref: ${{ github.sha }}
           tools: node pnpm
 
-      - name: Publish to npm
+      - name: Download the published release archives
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Fetch what is attached to the release rather than rebuilding, so the
+          # binaries in the platform packages are byte-identical to the archives
+          # the release checksums describe.
+          gh release download "${{ needs.meta.outputs.tag }}" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'uncomment-*-apple-darwin.tar.gz' --pattern 'uncomment-*-linux-gnu.tar.gz' \
+            --pattern 'uncomment-*-windows-gnu.zip' --pattern 'uncomment_*_checksums.txt' \
+            --dir artifacts --clobber
+          ls -l artifacts
+
+      - name: Verify and stage the release binaries into the platform packages
+        # Checks every archive against uncomment_<version>_checksums.txt before unpacking.
+        run: ./npm-package/stage-binaries.sh --artifacts artifacts
+
+      - name: Publish the platform packages, then the umbrella package
         env:
           NODE_AUTH_TOKEN: ""
+          VERSION: ${{ needs.meta.outputs.version }}
         run: |
+          set -euo pipefail
           unset NODE_AUTH_TOKEN
-          cd npm-package
-          version="${{ needs.meta.outputs.version }}"
-          if [[ "$version" == *"-rc."* ]]; then
+          if [[ "$VERSION" == *"-rc."* ]]; then
             npm_tag="beta"
           else
             npm_tag="latest"
           fi
 
-          pnpm publish --provenance --access public --tag "$npm_tag" --no-git-checks
+          publish_one() {
+            local dir="$1" name published status err
+            name="$(jq -r '.name' "$dir/package.json")"
+            [ "$(jq -r '.version' "$dir/package.json")" = "$VERSION" ] || {
+              echo "::error::$dir/package.json is not version $VERSION"
+              exit 1
+            }
+            # Skip a version a previous run already published; any lookup failure
+            # other than "package not found" stops the job.
+            err="$(mktemp)"
+            status=0
+            published="$(npm view "${name}@${VERSION}" version 2>"$err")" || status=$?
+            if [ "$status" -eq 0 ] && [ "$published" = "$VERSION" ]; then
+              echo "· ${name}@${VERSION} is already published; skipping"
+              return 0
+            fi
+            if [ "$status" -ne 0 ] && ! grep -q E404 "$err"; then
+              cat "$err" >&2
+              echo "::error::could not check whether ${name}@${VERSION} is published"
+              exit 1
+            fi
+            echo "→ publishing ${name}@${VERSION} (--tag ${npm_tag})"
+            pnpm publish "$dir" --provenance --access public --tag "$npm_tag" --no-git-checks
+          }
+
+          # Platform packages first: with `set -e` a failed one aborts the step
+          # before the umbrella is published, so `latest` never points at an
+          # umbrella whose pinned platform packages do not exist.
+          platforms=(npm-package/platforms/*/)
+          expected="$(jq -er '.optionalDependencies | length | select(. > 0)' npm-package/package.json)"
+          [ "${#platforms[@]}" -eq "$expected" ] || {
+            echo "::error::${#platforms[@]} platform packages, but the umbrella pins $expected"
+            exit 1
+          }
+          for dir in "${platforms[@]}"; do
+            publish_one "${dir%/}"
+          done
+          publish_one npm-package
 
   publish_pypi:
     name: Publish PyPI
@@ -642,7 +713,11 @@ jobs:
     if: >-
       !inputs.plugins-only && (always() && needs.meta.outputs.pypi_exists != 'true' && needs.finalize_release.result == 'success')
     runs-on: ubuntu-latest
+    # PyPI's trusted publisher for this project names this environment.
     environment: pypi
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -657,14 +732,38 @@ jobs:
           config-ref: ${{ github.sha }}
           tools: python
 
-      - name: Build Python package
+      - name: Download the published release archives
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install build
-          cd pip-package
-          python -m build
+          set -euo pipefail
+          gh release download "${{ needs.meta.outputs.tag }}" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'uncomment-*-apple-darwin.tar.gz' --pattern 'uncomment-*-linux-gnu.tar.gz' \
+            --pattern 'uncomment-*-windows-gnu.zip' --pattern 'uncomment_*_checksums.txt' \
+            --dir artifacts --clobber
+          ls -l artifacts
+
+      - name: Build the platform wheels and the download-fallback wheel
+        # build_wheels.py checks every archive against the release checksums before unpacking.
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip build hatchling
+          python pip-package/build_wheels.py --artifacts artifacts --out pip-package/dist
+          # Five platform wheels plus the py3-none-any fallback; no sdist.
+          count="$(find pip-package/dist -maxdepth 1 -name '*.whl' | wc -l)"
+          [ "$count" -eq 6 ] || {
+            echo "::error::expected 6 wheels, built $count"
+            exit 1
+          }
+          if find pip-package/dist -maxdepth 1 -name '*.tar.gz' | grep -q .; then
+            echo "::error::pip-package/dist must not contain an sdist"
+            exit 1
+          fi
+          ls -l pip-package/dist
 
       - name: Publish to PyPI
+        # Trusted publishing (OIDC). skip-existing lets a re-run finish a partially
+        # uploaded release.
         uses: pypa/gh-action-pypi-publish@v1.14.3
         with:
           packages-dir: pip-package/dist

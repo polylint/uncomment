@@ -11,7 +11,7 @@ A blazing fast Rust-based command-line tool that removes comments from your sour
 - 🎯 **100% Accurate** - Never accidentally removes code that looks like comments
 - 🛡️ **Safe by Default** - Preview changes before applying them
 - 🌍 **Multi-language** - 49 built-in languages, 306 available via [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack)
-- 🔧 **Zero Dependencies** - Downloads a self-contained binary
+- 🔧 **Self-contained** - Platform wheels ship the prebuilt binary; nothing is downloaded at install time
 
 ## Installation
 
@@ -19,7 +19,26 @@ A blazing fast Rust-based command-line tool that removes comments from your sour
 pip install uncomment
 ```
 
-The installer will automatically download the appropriate pre-compiled Rust binary for your platform (Windows, macOS, or Linux).
+### How the binary gets here
+
+1. **Platform wheel (primary).** Each release publishes one wheel per platform with the
+   prebuilt binary inside, so pip installs it with no further download (it works offline
+   and in sandboxes) and the wheel hash pip verifies covers the binary:
+
+   | Platform | Wheel tag |
+   | --- | --- |
+   | macOS (Apple silicon) | `macosx_11_0_arm64` |
+   | macOS (Intel) | `macosx_10_12_x86_64` |
+   | Linux arm64 (glibc 2.28+) | `manylinux_2_28_aarch64` |
+   | Linux x64 (glibc 2.28+) | `manylinux_2_28_x86_64` |
+   | Windows x64 | `win_amd64` |
+
+2. **Download (fallback).** On any other host pip picks the pure-Python `py3-none-any`
+   wheel, which carries no binary: the first run downloads the release archive for the
+   host from GitHub into `~/.cache/uncomment/<version>/`. Set `UNCOMMENT_BINARY` to use a
+   binary you already have. pip always prefers a matching platform wheel.
+
+There is no source distribution.
 
 ## Quick Start
 

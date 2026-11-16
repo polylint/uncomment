@@ -1,11 +1,16 @@
+// Postinstall download FALLBACK. The primary source of the native binary is the
+// platform package npm installs from `optionalDependencies` (see index.js); when
+// one resolved, this script does nothing and needs no network. It downloads only
+// when no platform package is present: optional dependencies were skipped, or the
+// host has no platform package (musl Linux, Windows arm64, ...). A failed
+// download never fails `npm install`; the launcher then prints the install hint.
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const https = require("node:https");
 const os = require("node:os");
 const path = require("node:path");
-const tar = require("tar");
-const AdmZip = require("adm-zip");
 
+const { DOWNLOADED_BINARY_PATH, resolvePlatformBinary } = require("./index.js");
 const { version } = require("./package.json");
 
 const BASE_URL = `https://github.com/polylint/uncomment/releases/download/v${version}`;
@@ -104,14 +109,12 @@ async function installBinary() {
   const isWindows = os.type() === "Windows_NT";
   const archiveName = `uncomment-${triple}.${isWindows ? "zip" : "tar.gz"}`;
 
-  const binDir = path.join(__dirname, "bin");
   // bin/uncomment is the committed launcher stub; the native executable lives
   // beside it under a distinct name so extraction never overwrites the stub.
-  const binaryName = isWindows ? "uncomment.exe" : "uncomment-bin";
-  const binaryPath = path.join(binDir, binaryName);
+  const binaryPath = DOWNLOADED_BINARY_PATH;
   const memberName = isWindows ? "uncomment.exe" : "uncomment";
 
-  fs.mkdirSync(binDir, { recursive: true });
+  fs.mkdirSync(path.dirname(binaryPath), { recursive: true });
 
   if (fs.existsSync(binaryPath)) {
     return;
@@ -142,6 +145,7 @@ async function installBinary() {
 
     console.log("Extracting...");
     if (isWindows) {
+      const AdmZip = require("adm-zip");
       const zip = new AdmZip(archivePath);
       const entry = zip.getEntries().find((e) => path.basename(e.entryName) === memberName);
       if (!entry) {
@@ -149,6 +153,7 @@ async function installBinary() {
       }
       zip.extractEntryTo(entry, stagingDir, false, true);
     } else {
+      const tar = require("tar");
       await tar.extract({
         file: archivePath,
         cwd: stagingDir,
@@ -171,7 +176,20 @@ async function installBinary() {
   }
 }
 
-installBinary().catch((error) => {
-  console.error(`Failed to install the uncomment binary: ${error.message}`);
-  process.exit(1);
-});
+function main() {
+  const platformBinary = resolvePlatformBinary();
+  if (platformBinary !== null) {
+    // The platform package supplied the binary; nothing to download.
+    return;
+  }
+
+  console.log("uncomment: no platform package installed for this host; downloading the release binary instead.");
+  installBinary().catch((error) => {
+    // Exit 0 on purpose: a missing binary is reported by the launcher at run time
+    // with the reinstall hint, and failing here would abort the whole install.
+    console.warn(`uncomment: fallback download failed: ${error.message}`);
+    console.warn("uncomment: the `uncomment` command will report how to install the binary when run.");
+  });
+}
+
+main();

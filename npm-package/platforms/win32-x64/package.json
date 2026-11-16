@@ -1,0 +1,31 @@
+{
+  "name": "@polylint/uncomment-win32-x64",
+  "version": "3.11.1",
+  "description": "The Windows x64 uncomment binary for @polylint/uncomment. Not useful on its own.",
+  "homepage": "https://github.com/polylint/uncomment#readme",
+  "bugs": {
+    "url": "https://github.com/polylint/uncomment/issues"
+  },
+  "license": "MIT",
+  "author": "Na'aman Hirschfeld",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polylint/uncomment.git",
+    "directory": "npm-package/platforms/win32-x64"
+  },
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "bin/"
+  ],
+  "preferUnplugged": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

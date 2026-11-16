@@ -62,6 +62,11 @@ checks that a TODO or FIXME still points at a live issue key instead of quietly 
 | npm (Node.js)          | `npm i -g @polylint/uncomment`                                                                  |
 | pip (Python)           | `pip install uncomment`                                                                         |
 
+The npm and pip packages install the prebuilt binary from a per-platform package (npm
+`optionalDependencies`, platform wheels on PyPI), so nothing is downloaded at install time on
+macOS, glibc Linux and Windows x64. Only when no platform package matches the host do they fall
+back to downloading the release archive from GitHub.
+
 Prefer prebuilt binaries? [`cargo binstall uncomment`](https://github.com/cargo-bins/cargo-binstall) downloads a
 release archive instead of compiling from source.
 
@@ -83,7 +88,7 @@ cd uncomment
 cargo install --path .
 ```
 
-Requires Rust 1.99+. npm and pip packages download pre-built binaries automatically.
+Requires Rust 1.99+.
 
 </details>
 

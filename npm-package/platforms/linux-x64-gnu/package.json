@@ -1,0 +1,34 @@
+{
+  "name": "@polylint/uncomment-linux-x64-gnu",
+  "version": "3.11.1",
+  "description": "The Linux x64 (glibc) uncomment binary for @polylint/uncomment. Not useful on its own.",
+  "homepage": "https://github.com/polylint/uncomment#readme",
+  "bugs": {
+    "url": "https://github.com/polylint/uncomment/issues"
+  },
+  "license": "MIT",
+  "author": "Na'aman Hirschfeld",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polylint/uncomment.git",
+    "directory": "npm-package/platforms/linux-x64-gnu"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "bin/"
+  ],
+  "preferUnplugged": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

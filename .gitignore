@@ -45,6 +45,14 @@ pip-package/uncomment/__pycache__/
 npm-package/bin/uncomment-bin
 npm-package/bin/uncomment.exe
 
+# Staged into the npm platform packages by npm-package/stage-binaries.sh at publish time.
+npm-package/platforms/*/bin/
+npm-package/platforms/*/LICENSE
+
+# Built by pip-package/build_wheels.py.
+pip-package/dist/
+pip-package/build/
+
 # Documentation
 doc/
 

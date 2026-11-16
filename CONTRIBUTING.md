@@ -44,7 +44,8 @@ the commit-msg hook validates the message. Run all hooks manually with
 
 1. Update versions:
    - `Cargo.toml`
-   - `npm-package/package.json`
+   - `npm-package/package.json` (its `version` and every `optionalDependencies` pin)
+   - `npm-package/platforms/*/package.json`
    - `pip-package/pyproject.toml`
    - `pip-package/uncomment/__init__.py`
 2. Run `mise run plugin:generate` to synchronize the plugin version and public skills.
@@ -63,14 +64,18 @@ Release candidates use `vX.Y.Z-rc.1` for Git/npm and `X.Y.Zrc1` for PyPI.
 ### Publishing
 
 - **Cargo**: `cargo publish`
-- **npm**: `cd npm-package && pnpm publish` (use `--tag beta` for RCs)
-- **PyPI**:
+- **npm** and **PyPI** publish from `.github/workflows/publish.yaml` only, from the finalized
+  release archives (npm: every platform package, then the umbrella; PyPI: five platform wheels and
+  the `py3-none-any` fallback wheel). To exercise the packaging locally:
 
   ```bash
-  cd pip-package
-  python -m build
-  twine upload dist/*          # use --repository testpypi for RCs
+  ./npm-package/stage-binaries.sh --artifacts <dir-with-release-archives-and-checksums>
+  python pip-package/build_wheels.py --artifacts <same-dir> --out pip-package/dist
   ```
+
+- A new npm platform package must exist before its trusted publisher can be configured. Pack the
+  first version from an existing release with `scripts/npm-stage-from-release.sh <version> <outdir>`
+  and publish each tarball by hand (`npm publish <tarball> --access public`).
 
 ### GitHub Release Workflow
 

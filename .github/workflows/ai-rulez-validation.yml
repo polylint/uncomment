@@ -26,6 +26,10 @@ jobs:
           python3 scripts/tests/test_public_skills.py
           python3 scripts/tests/test_plugin_version.py
           node --test scripts/tests/plugin-skills.test.mjs
+      - name: Verify the npm and PyPI packaging contract
+        run: |
+          python3 scripts/tests/test_distribution_packages.py
+          node --test scripts/tests/npm-launcher.test.mjs
       - name: Verify native Pi and OpenCode SDK contracts
         run: |
           npm install --prefix .native/sdk --ignore-scripts --no-package-lock @opencode/plugin@2.0.26 @earendil-works/pi-coding-agent@1.2.0 effect@4.0.0-rc.112

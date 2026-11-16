@@ -4,6 +4,21 @@ All notable changes to this project are documented in this file.
 
 This changelog is generated from git tags and commit history.
 
+## [Unreleased]
+
+### Changed
+
+- npm and PyPI now ship the binary in per-platform packages, so installing on macOS, glibc Linux
+  (x64/arm64) or Windows x64 downloads nothing beyond the registry and works in sandboxes and offline
+  mirrors. `@polylint/uncomment` pins one `@polylint/uncomment-<platform>` package per target as an
+  `optionalDependency` (`darwin-arm64`, `darwin-x64`, `linux-arm64-gnu`, `linux-x64-gnu`,
+  `win32-x64`); PyPI gets one wheel per target (`macosx_11_0_arm64`, `macosx_10_12_x86_64`,
+  `manylinux_2_28_aarch64`, `manylinux_2_28_x86_64`, `win_amd64`) and no sdist.
+- Downloading the release archive from GitHub is now only the fallback, for hosts no platform package
+  matches: the npm `postinstall` skips it when a platform package resolved and no longer fails the
+  install when it cannot download, and the pure-Python `py3-none-any` wheel keeps the first-run
+  downloader (and its `certifi` dependency) for platforms without a wheel.
+
 ## [v3.11.1] - 2026-11-16
 
 3.11.0 was prepared but never published; its changes ship in this release.

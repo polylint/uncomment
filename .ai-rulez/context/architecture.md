@@ -43,10 +43,16 @@ grammar loader and nothing is fetched at runtime.
 
 ### Distribution
 
-- `npm-package/` — npm wrapper package (`@polylint/uncomment`)
-  - `package.json`, `install.js` — Binary download and install
-- `pip-package/` — PyPI wrapper package (`uncomment`)
-  - `pyproject.toml`, `uncomment/__init__.py`, `uncomment/downloader.py`
+- `npm-package/` — npm umbrella package (`@polylint/uncomment`)
+  - `package.json` — pins the platform packages as exact-version `optionalDependencies`
+  - `index.js`, `bin/uncomment` — resolve and run the binary: platform package first, then the downloaded one
+  - `install.js` — `postinstall` download fallback, a no-op when a platform package resolved
+  - `platforms/<platform>/` — one `@polylint/uncomment-<platform>` package per release target
+  - `stage-binaries.sh` — verifies the release archives and stages their binaries into the platform packages
+- `pip-package/` — PyPI package (`uncomment`)
+  - `build_wheels.py`, `hatch_build.py` — one platform wheel per release target plus the `py3-none-any` fallback wheel
+  - `uncomment/cli.py` — runs the bundled binary, or hands off to `uncomment/downloader.py` on the fallback wheel
+- `scripts/npm-stage-from-release.sh` — packs the npm platform packages for an existing release (first-publish bootstrap)
 - `.github/workflows/` — CI/CD and release automation (`publish.yaml` builds cross-platform binaries via a native matrix)
 - `scripts/publish/` — Homebrew formula and Scoop manifest templates plus their asset maps, rendered by the release workflow
 

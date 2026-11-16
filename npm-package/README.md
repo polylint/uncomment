@@ -11,7 +11,7 @@ A blazing fast Rust-based command-line tool that removes comments from your sour
 - 🎯 **100% Accurate** - Never accidentally removes code that looks like comments
 - 🛡️ **Safe by Default** - Preview changes before applying them
 - 🌍 **Multi-language** - 49 built-in languages, 306 available via [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack)
-- 🔧 **Self-contained** - Installs a single static Rust binary, checksum-verified against the GitHub release
+- 🔧 **Self-contained** - Installs a single prebuilt Rust binary from a per-platform package; no install-time download on supported platforms
 
 ## Installation
 
@@ -22,17 +22,29 @@ npm i -g @polylint/uncomment
 Or run it without installing: `npx @polylint/uncomment .`. The installed command is still
 `uncomment`. This package was previously published as `uncomment-cli`, which is deprecated.
 
-The postinstall step downloads the pre-compiled binary for your platform and verifies
-it against the release checksum manifest. Prebuilt archives exist for:
+### How the binary gets here
 
-| Platform | Architectures |
+1. **Platform package (primary).** This package lists one platform package per release
+   target under `optionalDependencies`, each carrying one prebuilt binary and marked with
+   the `os`, `cpu` and `libc` it is for. npm installs only the one matching your machine,
+   so the install needs nothing beyond the npm registry (it works in sandboxes and behind
+   registry mirrors), and the registry's integrity hashes cover the binary.
+2. **Download (fallback).** Only when no platform package was installed (optional
+   dependencies skipped, or a host with no platform package), the `postinstall` step
+   downloads the release archive from GitHub and verifies it against the release
+   checksum manifest. A failed fallback download does not fail `npm install`; running
+   `uncomment` then explains how to get the binary.
+
+| Platform | Package |
 | --- | --- |
-| Linux (glibc) | `x86_64`, `aarch64` |
-| macOS | `x86_64`, `aarch64` |
-| Windows | `x86_64` |
+| macOS (Apple silicon) | `@polylint/uncomment-darwin-arm64` |
+| macOS (Intel) | `@polylint/uncomment-darwin-x64` |
+| Linux arm64 (glibc) | `@polylint/uncomment-linux-arm64-gnu` |
+| Linux x64 (glibc) | `@polylint/uncomment-linux-x64-gnu` |
+| Windows x64 | `@polylint/uncomment-win32-x64` |
 
-Anything else — musl/Alpine Linux, 32-bit, other architectures — has no prebuilt
-archive; install with `cargo install uncomment` instead.
+Anything else (musl/Alpine Linux, 32-bit, other architectures) has no prebuilt binary at
+all; install with `cargo install uncomment` instead.
 
 ## Commands
 

@@ -1,30 +1,16 @@
 #!/usr/bin/env node
-// Launcher stub. The real executable is fetched per-platform by install.js and
-// lands beside this file as uncomment-bin (or uncomment.exe on Windows). Keeping
-// the npm `bin` entry a script means the published tarball stays platform-neutral
-// and npm can generate its Windows .cmd shim.
+// Launcher stub. The native executable comes from the matching platform package
+// (an optionalDependency), or, when none was installed, from the binary the
+// postinstall download fallback placed beside this file. Keeping the npm `bin`
+// entry a script means the published tarball stays platform-neutral and npm can
+// generate its Windows .cmd shim.
 const { spawnSync } = require("node:child_process");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
+const { missingBinaryMessage, resolveBinaryPath } = require("../index.js");
 
-const isWindows = os.type() === "Windows_NT";
-const executable = path.join(
-  __dirname,
-  isWindows ? "uncomment.exe" : "uncomment-bin",
-);
+const executable = resolveBinaryPath();
 
-if (!fs.existsSync(executable)) {
-  console.error(
-    [
-      "uncomment: the native binary is missing.",
-      "",
-      "It is downloaded by this package's postinstall step. Reinstall to retry:",
-      "  npm i -g @polylint/uncomment",
-      "",
-      "If the install ran with --ignore-scripts, the binary was never fetched.",
-    ].join("\n"),
-  );
+if (executable === null) {
+  console.error(missingBinaryMessage());
   process.exit(1);
 }
 
