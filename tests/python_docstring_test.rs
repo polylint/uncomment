@@ -158,11 +158,5 @@ class MyClass:
 }
 
 fn get_binary_path() -> std::path::PathBuf {
-    std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("uncomment")
+    std::path::PathBuf::from(env!("CARGO_BIN_EXE_uncomment"))
 }

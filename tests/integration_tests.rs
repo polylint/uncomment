@@ -21,13 +21,7 @@ fn test_gitignore_from_subdirectory() {
 
     Command::new("git").current_dir(root).args(["init"]).output().unwrap();
 
-    let uncomment_path = std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("uncomment");
+    let uncomment_path = get_binary_path();
 
     let output = Command::new(&uncomment_path)
         .current_dir(&subfolder)
@@ -77,13 +71,7 @@ fn test_gitignore_with_no_gitignore_flag() {
 
     Command::new("git").current_dir(root).args(["init"]).output().unwrap();
 
-    let uncomment_path = std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("uncomment");
+    let uncomment_path = get_binary_path();
 
     let output = Command::new(&uncomment_path)
         .current_dir(&subfolder)
@@ -548,11 +536,5 @@ remove_todos = false
 }
 
 fn get_binary_path() -> std::path::PathBuf {
-    std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("uncomment")
+    std::path::PathBuf::from(env!("CARGO_BIN_EXE_uncomment"))
 }

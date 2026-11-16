@@ -5,13 +5,7 @@ use std::process::{Command, Output};
 use tempfile::TempDir;
 
 fn uncomment_binary() -> PathBuf {
-    std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("uncomment")
+    PathBuf::from(env!("CARGO_BIN_EXE_uncomment"))
 }
 
 fn run(file: &std::path::Path, args: &[&str]) -> Output {
