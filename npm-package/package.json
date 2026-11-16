@@ -1,5 +1,5 @@
 {
-  "name": "uncomment-cli",
+  "name": "@polylint/uncomment",
   "version": "3.11.0",
   "description": "A fast Rust-based CLI tool for removing comments from source code",
   "bin": {
@@ -23,11 +23,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Goldziher/uncomment.git"
+    "url": "https://github.com/polylint/uncomment.git"
   },
-  "homepage": "https://github.com/Goldziher/uncomment#readme",
+  "homepage": "https://github.com/polylint/uncomment#readme",
   "bugs": {
-    "url": "https://github.com/Goldziher/uncomment/issues"
+    "url": "https://github.com/polylint/uncomment/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "dependencies": {
     "adm-zip": "^0.6.1",

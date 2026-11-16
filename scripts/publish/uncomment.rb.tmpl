@@ -1,0 +1,41 @@
+# typed: false
+# frozen_string_literal: true
+
+class Uncomment < Formula
+  desc "Fast, AST-accurate comment removal and tag-comment linting built on tree-sitter"
+  homepage "https://github.com/polylint/uncomment"
+  version "${version}"
+  license "MIT"
+
+  on_macos do
+    on_arm do
+      url "https://github.com/polylint/uncomment/releases/download/v#{version}/uncomment-aarch64-apple-darwin.tar.gz"
+      sha256 "${macos_arm_sha}"
+    end
+
+    on_intel do
+      url "https://github.com/polylint/uncomment/releases/download/v#{version}/uncomment-x86_64-apple-darwin.tar.gz"
+      sha256 "${macos_intel_sha}"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/polylint/uncomment/releases/download/v#{version}/uncomment-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "${linux_arm_sha}"
+    end
+
+    on_intel do
+      url "https://github.com/polylint/uncomment/releases/download/v#{version}/uncomment-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "${linux_intel_sha}"
+    end
+  end
+
+  def install
+    bin.install "uncomment"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/uncomment --version")
+  end
+end

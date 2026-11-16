@@ -151,7 +151,7 @@ jobs:
           fi
 
           npm_exists=false
-          if pnpm view "uncomment-cli@${version}" version >/dev/null 2>&1; then
+          if pnpm view "@polylint/uncomment@${version}" version >/dev/null 2>&1; then
             npm_exists=true
           fi
 
@@ -503,7 +503,7 @@ jobs:
   float_major_tag:
     name: Float the major tag
     needs: [meta, finalize_release]
-    # Consumers can use `uses: Goldziher/uncomment@v3`; point that tag at every stable release.
+    # Consumers can use `uses: polylint/uncomment@v3`; point that tag at every stable release.
     # Pre-releases keep their own version tag only, so `v3` never resolves to an rc.
     if: >-
       !inputs.plugins-only && (always() && needs.meta.result == 'success' && needs.finalize_release.result == 'success' && !contains(needs.meta.outputs.version, '-rc') && !contains(needs.meta.outputs.version, '-beta') && !contains(needs.meta.outputs.version, '-alpha'))
@@ -670,46 +670,263 @@ jobs:
           packages-dir: pip-package/dist
           skip-existing: true
 
-  publish_homebrew:
+  publish-homebrew-formula:
     name: Update Homebrew formula
     needs: [meta, finalize_release]
     if: >-
-      !inputs.plugins-only && (always() && needs.finalize_release.result == 'success' && !contains(needs.meta.outputs.version, '-rc') && !contains(needs.meta.outputs.version, '-beta') && !contains(needs.meta.outputs.version, '-alpha'))
+      !inputs.plugins-only && (always() && needs.meta.result == 'success' && needs.finalize_release.result == 'success' && !contains(needs.meta.outputs.version, '-rc') && !contains(needs.meta.outputs.version, '-beta') && !contains(needs.meta.outputs.version, '-alpha'))
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/create-github-app-token@v3
+        id: tap-token
         with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || '' }}
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: polylint
+          repositories: homebrew-tap
 
-      - name: Generate formula and push to tap
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - uses: actions/checkout@v7
+        with:
+          repository: polylint/homebrew-tap
+          token: ${{ steps.tap-token.outputs.token }}
+          path: homebrew-tap
+          persist-credentials: true
+
+      - uses: xberg-io/actions/publish-homebrew-source-formulas@v1
+        with:
+          tap-dir: ${{ github.workspace }}/homebrew-tap
+          config-file: scripts/publish/homebrew.json
+          tag: ${{ needs.meta.outputs.tag }}
+          version: ${{ needs.meta.outputs.version }}
+          github-repo: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push to tap
+        working-directory: homebrew-tap
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+          VERSION: ${{ needs.meta.outputs.version }}
         run: |
-          set -euo pipefail
-          if [ -z "${HOMEBREW_TOKEN:-}" ]; then
-            echo "HOMEBREW_TOKEN not set — skipping the Homebrew formula update."
+          git config user.name "polylint-release-helper[bot]"
+          git config user.email "357288453+polylint-release-helper[bot]@users.noreply.github.com"
+          if git diff --quiet Formula/; then
+            echo "No formula changes; skipping commit."
             exit 0
           fi
-          tag="${{ needs.meta.outputs.tag }}"
-          version="${{ needs.meta.outputs.version }}"
-          gh release download "$tag" -p "uncomment_${version}_checksums.txt" -O checksums.txt
-          ./scripts/update-homebrew-formula.sh "$version" checksums.txt > uncomment.rb
-
-          git clone --depth 1 "https://x-access-token:${HOMEBREW_TOKEN}@github.com/Goldziher/homebrew-tap.git" tap
-          cp uncomment.rb tap/Formula/uncomment.rb
-          cd tap
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/uncomment.rb
-          if git diff --cached --quiet; then
-            echo "Formula already up to date."
-          else
-            git commit -m "uncomment ${version}"
-            git push
+          git commit -m "uncomment ${VERSION}"
+          # Every polylint release pipeline pushes to this one shared tap, so a concurrent release
+          # can land between our checkout and our push and reject it as non-fast-forward. Each repo
+          # touches only its own files, so rebasing onto the new tip and retrying is safe. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current tap tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::tap rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the tap after 5 attempts"
+          exit 1
+
+  # The Windows counterpart of publish-homebrew-formula. Re-running a release is a no-op: the
+  # render step rewrites the manifest in place and the commit is guarded by `git diff --quiet`. ~keep
+  publish-scoop-manifest:
+    name: Update Scoop manifest
+    needs: [meta, finalize_release]
+    if: >-
+      !inputs.plugins-only && (always() && needs.meta.result == 'success' && needs.finalize_release.result == 'success' && !contains(needs.meta.outputs.version, '-rc') && !contains(needs.meta.outputs.version, '-beta') && !contains(needs.meta.outputs.version, '-alpha'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: bucket-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: polylint
+          repositories: scoop-bucket
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - uses: actions/checkout@v7
+        with:
+          repository: polylint/scoop-bucket
+          token: ${{ steps.bucket-token.outputs.token }}
+          path: scoop-bucket
+          persist-credentials: true
+
+      - uses: xberg-io/actions/publish-scoop-manifests@v1
+        with:
+          bucket-dir: ${{ github.workspace }}/scoop-bucket
+          config-file: scripts/publish/scoop.json
+          tag: ${{ needs.meta.outputs.tag }}
+          version: ${{ needs.meta.outputs.version }}
+          github-repo: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push to bucket
+        working-directory: scoop-bucket
+        env:
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          git config user.name "polylint-release-helper[bot]"
+          git config user.email "357288453+polylint-release-helper[bot]@users.noreply.github.com"
+          if git diff --quiet bucket/ && [ -z "$(git status --porcelain bucket/)" ]; then
+            echo "No manifest changes; skipping commit."
+            exit 0
           fi
+          git add bucket/uncomment.json
+          git commit -m "uncomment ${VERSION}"
+          # Every polylint release pipeline pushes to this one shared bucket, so a concurrent release
+          # can land between our checkout and our push and reject it as non-fast-forward. Each repo
+          # touches only its own files, so rebasing onto the new tip and retrying is safe. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current bucket tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::bucket rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the bucket after 5 attempts"
+          exit 1
+
+  homebrew-bottles:
+    name: Build Homebrew bottle (${{ matrix.bottle_tag }})
+    needs: [meta, publish-homebrew-formula]
+    if: >-
+      !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-26, bottle_tag: arm64_tahoe, install_brew: false }
+          - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
+          - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: polylint
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - name: Install Homebrew (Linux)
+        if: ${{ matrix.install_brew }}
+        uses: xberg-io/actions/install-homebrew-linux@v1
+
+      - name: Build bottles
+        uses: xberg-io/actions/homebrew-build-bottles@v1
+        with:
+          tag: ${{ needs.meta.outputs.tag }}
+          version: ${{ needs.meta.outputs.version }}
+          tap: polylint/tap
+          formulas: |
+            uncomment
+          out-dir: ${{ github.workspace }}/bottle-json
+          github-repo: ${{ github.repository }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: homebrew-bottle-json-${{ matrix.bottle_tag }}
+          path: ${{ github.workspace }}/bottle-json/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-homebrew-bottles:
+    name: Merge Homebrew bottle DSL
+    needs: [meta, publish-homebrew-formula, homebrew-bottles]
+    if: >-
+      !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success' && needs.homebrew-bottles.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: tap-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: polylint
+          repositories: homebrew-tap
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - uses: actions/checkout@v7
+        with:
+          repository: polylint/homebrew-tap
+          token: ${{ steps.tap-token.outputs.token }}
+          path: homebrew-tap
+          persist-credentials: true
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: ${{ github.workspace }}/bottle-json
+          pattern: homebrew-bottle-json-*
+          merge-multiple: true
+
+      - uses: xberg-io/actions/homebrew-merge-bottles@v1
+        with:
+          tag: ${{ needs.meta.outputs.tag }}
+          version: ${{ needs.meta.outputs.version }}
+          tap-dir: ${{ github.workspace }}/homebrew-tap
+          json-dir: ${{ github.workspace }}/bottle-json
+          formulas: |
+            uncomment
+          github-repo: ${{ github.repository }}
+
+      - name: Commit and push bottle DSL
+        working-directory: homebrew-tap
+        env:
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          git config user.name "polylint-release-helper[bot]"
+          git config user.email "357288453+polylint-release-helper[bot]@users.noreply.github.com"
+          if git diff --quiet Formula/; then
+            echo "No bottle DSL changes; skipping commit."
+            exit 0
+          fi
+          git add Formula/uncomment.rb
+          git commit -m "uncomment ${VERSION}: add bottle DSL"
+          # Every polylint release pipeline pushes to this one shared tap, so a concurrent release
+          # can land between our checkout and our push and reject it as non-fast-forward. Each repo
+          # touches only its own files, so rebasing onto the new tip and retrying is safe. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current tap tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::tap rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the tap after 5 attempts"
+          exit 1
 
   publish-plugin-opencode:
     name: Publish OpenCode and Pi plugin to npm
@@ -753,7 +970,7 @@ jobs:
           const pkg = require('./plugin/package.json');
           const packed = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
           if (packed.length !== 1) throw new Error('Expected exactly one packed plugin');
-          if (pkg.name !== '@goldziher/opencode-uncomment' || packed[0].version !== pkg.version) {
+          if (pkg.name !== '@polylint/opencode-uncomment' || packed[0].version !== pkg.version) {
             throw new Error('Unexpected npm plugin identity or version');
           }
           const files = packed[0].files.map(file => file.path);

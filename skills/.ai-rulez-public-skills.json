@@ -2,9 +2,9 @@
   "source": "plugin/skills",
   "skill_count": 1,
   "files": {
-    "uncomment/SKILL.md": "abe0ad0ca2553a8fbb0d8d0097dd5ee8ec707bb3575ed105e57afb078fa278a9",
-    "uncomment/index.md": "323f8ecef189b3f8d8ccc4566ddf15203413921ada5ce03a6bc08bc258ce51c5",
-    "uncomment/references/configuration.md": "2aba9066e1038c541559ea8562f1caef173cbd6b8b869e1f140ae197930c921e",
-    "uncomment/references/library.md": "de49f8f971a7a5d128a116f875262119a791a4774e9af0c9351ec63af63f52cc"
+    "uncomment/SKILL.md": "0681fd3abc90a114e193b9930c302ec5a6b8b3c6c753470f0ca0033b97dce6d8",
+    "uncomment/index.md": "ffca28c073b13b10359b0340da1c14a31b5cfbab94b51591556b1de23497e501",
+    "uncomment/references/configuration.md": "80ed5d140af27e3b52fa0222d50cb5cce2b485fb7e450189a27af05f15aea50b",
+    "uncomment/references/library.md": "ffa51d8cfeb6254c08b163747d4021f2bdd7610d56b13d6c450a19d37ceaba35"
   }
 }

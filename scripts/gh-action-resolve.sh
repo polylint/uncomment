@@ -4,7 +4,7 @@
 # install directory is known before the actions/cache step that wraps it.
 set -euo pipefail
 
-repo="${REPOSITORY:-Goldziher/uncomment}"
+repo="${REPOSITORY:-polylint/uncomment}"
 
 # Resolve a floating `latest` or major-only `v3` reference to the newest matching stable release.
 # A floating major tag carries no release assets of its own, so the assets always come from the

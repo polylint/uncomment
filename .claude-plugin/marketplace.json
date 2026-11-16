@@ -2,7 +2,7 @@
   "name": "uncomment",
   "description": "Uncomment skills for AST-based source comment cleanup",
   "owner": {
-    "name": "Goldziher"
+    "name": "polylint"
   },
   "plugins": [
     {

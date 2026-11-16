@@ -1,7 +1,7 @@
 # uncomment
 
 [![PyPI](https://img.shields.io/pypi/v/uncomment?style=flat-square&color=2dd4bf)](https://pypi.org/project/uncomment/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-2dd4bf?style=flat-square)](https://github.com/Goldziher/uncomment/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2dd4bf?style=flat-square)](https://github.com/polylint/uncomment/blob/main/LICENSE)
 
 A blazing fast Rust-based command-line tool that removes comments from your source code. Perfect for cleaning up AI-generated code that comes with excessive explanations.
 
@@ -108,8 +108,12 @@ While this tool works great for Python, it also supports:
 ## Documentation
 
 For detailed documentation, advanced options, and examples, visit:
-[https://github.com/Goldziher/uncomment](https://github.com/Goldziher/uncomment)
+[https://github.com/polylint/uncomment](https://github.com/polylint/uncomment)
+
+## polylint organization
+
+uncomment is part of [polylint](https://github.com/polylint), high-performance Rust linters and formatters built for agentic workflows. Sibling tools: [polylint](https://github.com/polylint/polylint) (one linter and formatter for every language; it can run uncomment as an engine), [skif](https://github.com/polylint/skif) (JS/TS dependency linter), [adrlint](https://github.com/polylint/adrlint) (MADR decision records). Install any of them from the Homebrew tap (`brew tap polylint/tap`) or the Scoop bucket.
 
 ## License
 
-MIT - see [LICENSE](https://github.com/Goldziher/uncomment/blob/main/LICENSE) for details.
+MIT - see [LICENSE](https://github.com/polylint/uncomment/blob/main/LICENSE) for details.

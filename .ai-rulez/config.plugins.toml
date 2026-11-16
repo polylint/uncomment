@@ -8,4 +8,4 @@ name = "uncomment"
 description = "Uncomment skills for AST-based source comment cleanup"
 members = ["plugin"]
 [marketplace.owner]
-name = "Goldziher"
+name = "polylint"

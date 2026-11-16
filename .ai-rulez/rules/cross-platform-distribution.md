@@ -15,11 +15,12 @@ uncomment is distributed across multiple package ecosystems. All distribution ch
 ### Distribution Channels
 
 - **crates.io**: Published via `cargo publish`. Primary source of truth for the Rust binary.
-- **npm** (package: `uncomment-cli`): Binary wrapper in `npm-package/` that downloads pre-built binaries from GitHub Releases via `install.js`.
+- **npm** (package: `@polylint/uncomment`, bin `uncomment`; formerly `uncomment-cli`): Binary wrapper in `npm-package/` that downloads pre-built binaries from GitHub Releases via `install.js`.
 - **PyPI** (package: `uncomment`): Binary wrapper in `pip-package/` with `uncomment/downloader.py` handling binary acquisition.
-- **Homebrew**: Formula in the `Goldziher/homebrew-tap` repo (`Formula/uncomment.rb`), regenerated from the release checksums by `scripts/update-homebrew-formula.sh` and pushed by the `publish_homebrew` job.
+- **Homebrew**: Formula in the `polylint/homebrew-tap` repo (`Formula/uncomment.rb`, `brew install polylint/tap/uncomment`), rendered from `scripts/publish/uncomment.rb.tmpl` by `xberg-io/actions/publish-homebrew-source-formulas` in the `publish-homebrew-formula` job and pushed by the polylint GitHub App; `homebrew-bottles` and `publish-homebrew-bottles` then build bottles and merge the bottle DSL.
+- **Scoop**: Manifest in the `polylint/scoop-bucket` repo (`bucket/uncomment.json`), rendered from `scripts/publish/uncomment.json.tmpl` by the `publish-scoop-manifest` job.
 - **GitHub Actions (release automation)**: Cross-platform binary builds and release automation live in `.github/workflows/publish.yaml` (a native per-platform build matrix — goreleaser was removed in v3.1.0).
-- **GitHub Action (consumer-facing)**: Root `action.yml` is a composite action (`Goldziher/uncomment@vX.Y.Z`) that downloads and checksum-verifies the release asset matching the runner's OS/arch, caches it with `actions/cache`, and runs `uncomment`/`uncomment lint`. Install logic lives in `scripts/gh-action-*.sh`; annotations come from `problem-matcher.json`. Tested by `.github/workflows/action.yml`.
+- **GitHub Action (consumer-facing)**: Root `action.yml` is a composite action (`polylint/uncomment@vX.Y.Z`) that downloads and checksum-verifies the release asset matching the runner's OS/arch, caches it with `actions/cache`, and runs `uncomment`/`uncomment lint`. Install logic lives in `scripts/gh-action-*.sh`; annotations come from `problem-matcher.json`. Tested by `.github/workflows/action.yml`.
 
 ### Release Workflow
 
@@ -30,7 +31,7 @@ uncomment is distributed across multiple package ecosystems. All distribution ch
    (macOS on `macos-26`/`macos-26-intel`, Windows cross-compiled with mingw-w64,
    Linux in `manylinux_2_28` containers), uploads them plus a checksums file, then
    promotes the draft to a published release
-5. npm, PyPI, and Homebrew publish from the finalized GitHub Release assets
+5. npm, PyPI, Homebrew, and Scoop publish from the finalized GitHub Release assets
 
 ### Guidelines
 

@@ -9,7 +9,7 @@ python = "3.15.2"
 uv = "0.13.6"
 node = "26.13.0"
 pnpm = "12.16.1"
-"github:Goldziher/poly" = "0.32.1"
+"github:polylint/polylint" = "0.35.0"
 actionlint = "1.7.12"
 
 [vars]
@@ -45,11 +45,11 @@ run = "cargo clean"
 
 [tasks.update]
 description = "Update dependencies"
-run = ["cargo update", "poly hooks update", "poly hooks install"]
+run = ["cargo update", "poly lock", "poly hooks install"]
 
 [tasks."ai:hooks"]
 description = "Update the reviewed governance hooks and install them while preserving local preferences"
-run = ["poly hooks update", { task = "governance:hooks:install" }]
+run = ["poly lock", { task = "governance:hooks:install" }]
 
 [tasks."ai:validate"]
 description = "Validate both native governance configurations and plugin exports"

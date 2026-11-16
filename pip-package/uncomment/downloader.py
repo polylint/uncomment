@@ -50,7 +50,7 @@ def _asset(version: str) -> tuple[str, str]:
     triple = _platform_triple()
     ext = "zip" if "windows" in triple else "tar.gz"
     url = (
-        f"https://github.com/Goldziher/uncomment/releases/download/"
+        f"https://github.com/polylint/uncomment/releases/download/"
         f"v{tag}/uncomment-{triple}.{ext}"
     )
     return url, ext

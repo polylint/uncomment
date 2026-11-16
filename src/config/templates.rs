@@ -88,7 +88,7 @@ preserve_patterns = []
 
     pub fn template() -> String {
         r#"# Uncomment Configuration File
-# https://github.com/Goldziher/uncomment
+# https://github.com/polylint/uncomment
 
 [global]
 # Global settings that apply to all files
@@ -313,7 +313,7 @@ preserve_patterns = []
         r#"# Comprehensive Uncomment Configuration File
 # Every global and pattern option, spelled out with its default. The [languages.*] sections are
 # examples of overriding a built-in, not the full list — all 55 built-ins work with no config at all.
-# https://github.com/Goldziher/uncomment
+# https://github.com/polylint/uncomment
 
 [global]
 # Global settings that apply to all files
@@ -553,7 +553,7 @@ remove_fixme = false
         let mut config = String::from(
             r#"# Smart Uncomment Configuration
 # Generated based on detected files in your project
-# https://github.com/Goldziher/uncomment
+# https://github.com/polylint/uncomment
 
 [global]
 remove_todos = false
@@ -954,7 +954,7 @@ traverse_git_repos = false
         let mut config = format!(
             r#"# Interactive Uncomment Configuration
 # Generated through interactive setup
-# https://github.com/Goldziher/uncomment
+# https://github.com/polylint/uncomment
 
 [global]
 remove_todos = {remove_todos}

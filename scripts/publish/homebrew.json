@@ -1,0 +1,14 @@
+{
+  "formulas": [
+    {
+      "name": "uncomment",
+      "template": "scripts/publish/uncomment.rb.tmpl",
+      "assets": {
+        "macos_arm_sha": "uncomment-aarch64-apple-darwin.tar.gz",
+        "macos_intel_sha": "uncomment-x86_64-apple-darwin.tar.gz",
+        "linux_arm_sha": "uncomment-aarch64-unknown-linux-gnu.tar.gz",
+        "linux_intel_sha": "uncomment-x86_64-unknown-linux-gnu.tar.gz"
+      }
+    }
+  ]
+}

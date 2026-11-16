@@ -19,7 +19,7 @@ text = "# uncomment Hermes plugin\n\nInventory, preserve and remove source comme
 uncomment = 'uncomment_hermes_plugin'
 
 [project.urls]
-Repository = 'https://github.com/Goldziher/uncomment'
+Repository = 'https://github.com/polylint/uncomment'
 
 [tool]
 [tool.hatch]

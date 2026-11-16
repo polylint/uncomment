@@ -10,7 +10,7 @@ x-ai-rulez:
     license: MIT
     metadata:
       author: Goldziher
-      repository: https://github.com/Goldziher/uncomment
+      repository: https://github.com/polylint/uncomment
 ---
 
 ## Uncomment Source Comment Cleanup
@@ -21,7 +21,7 @@ CLI separately; this plugin provides instructions and has no MCP server.
 
 ```bash
 cargo install uncomment --version '^3.10'
-# Binary wrappers are available as uncomment-cli on npm and uncomment on PyPI.
+# Binary wrappers are available as @polylint/uncomment on npm and uncomment on PyPI.
 uncomment --version
 ```
 

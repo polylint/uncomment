@@ -15,7 +15,7 @@ Thanks for helping improve `uncomment`! This guide keeps the local workflow and 
 ### Bootstrap
 
 ```bash
-git clone https://github.com/Goldziher/uncomment.git
+git clone https://github.com/polylint/uncomment.git
 cd uncomment
 cargo check
 cargo test
@@ -78,7 +78,7 @@ Pushing the tag triggers `.github/workflows/publish.yaml`, which builds signed b
 
 ### After Publishing
 
-- Verify installs: `cargo install uncomment`, `pnpm view uncomment-cli`, `pip index versions uncomment`
+- Verify installs: `cargo install uncomment`, `npm view @polylint/uncomment`, `pip index versions uncomment`
 - Announce the release and update any downstream docs if needed
 
 ## AI governance and public plugins
@@ -104,22 +104,31 @@ versions follow `[package].version` in `Cargo.toml`; release tags must agree.
 
 ## Plugin registry publishing prerequisites
 
-The generated packages are `@goldziher/opencode-uncomment` for OpenCode and Pi,
+The generated packages are `@polylint/opencode-uncomment` for OpenCode and Pi,
 and `uncomment-hermes-plugin` for Hermes. Their public registry endpoints currently
 return 404; these are planned publishing identities, not available registry installs.
-Use the Git/local plugin paths until their first successful publication. The existing
-`uncomment-cli` npm and `uncomment` PyPI wrappers are separate packages, and their
+Use the Git/local plugin paths until their first successful publication. The
+`@polylint/uncomment` npm and `uncomment` PyPI wrappers are separate packages, and their
 publisher permissions do not establish ownership of the new plugin names.
+
+The npm packages moved to the `@polylint` scope with the repository's move to the
+polylint organization: `uncomment-cli` became `@polylint/uncomment` (the installed
+command is still `uncomment`) and `@goldziher/opencode-uncomment` became
+`@polylint/opencode-uncomment`. A maintainer publishes the first version of each scoped
+name once by hand, then configures the trusted publisher below and deprecates the old
+name with a pointer to the new one (`npm deprecate uncomment-cli "Moved to @polylint/uncomment"`).
+The `uncomment` crate and PyPI project keep their names; their trusted publishers must
+name owner `polylint`.
 
 Before the next patch release, an authorized maintainer must confirm control of the
 npm scope/package and the PyPI project name. npm configures trusted publishers from
 an existing package's settings; bootstrap an absent package through a separately
 approved maintainer publication. Then configure npm's GitHub trusted publisher for
-owner `Goldziher`, repository `uncomment`, workflow `publish.yaml`, with no environment
+owner `polylint`, repository `uncomment`, workflow `publish.yaml`, with no environment
 claim (the npm job declares none), and allow direct publishing. See the
 [npm trusted publisher instructions](https://docs.npmjs.com/trusted-publishers/).
 
-For PyPI, configure `uncomment-hermes-plugin` with owner `Goldziher`, repository
+For PyPI, configure `uncomment-hermes-plugin` with owner `polylint`, repository
 `uncomment`, workflow `publish.yaml`, environment `pypi`. An absent project can use a
 [pending trusted publisher](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/).
 Account ownership and these external publisher settings have not been verified by

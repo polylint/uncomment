@@ -33,7 +33,7 @@
   ],
   "license": "MIT",
   "main": ".opencode/plugins/uncomment.js",
-  "name": "@goldziher/opencode-uncomment",
+  "name": "@polylint/opencode-uncomment",
   "pi": {
     "prompts": [],
     "skills": [
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Goldziher/uncomment"
+    "url": "https://github.com/polylint/uncomment"
   },
   "type": "module",
   "version": "3.11.0"

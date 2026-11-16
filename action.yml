@@ -1,7 +1,7 @@
 name: uncomment-cli
 description: >-
   Tree-sitter-accurate CLI that removes comments from source code or lints TODO/FIXME/HACK/XXX tags.
-author: Goldziher
+author: polylint
 branding:
   icon: message-square
   color: green
@@ -59,7 +59,7 @@ inputs:
   repository:
     description: "Advanced: override the owner/repo release assets are downloaded from."
     required: false
-    default: "Goldziher/uncomment"
+    default: "polylint/uncomment"
 
 outputs:
   version:

@@ -8,7 +8,7 @@ const AdmZip = require("adm-zip");
 
 const { version } = require("./package.json");
 
-const BASE_URL = `https://github.com/Goldziher/uncomment/releases/download/v${version}`;
+const BASE_URL = `https://github.com/polylint/uncomment/releases/download/v${version}`;
 
 // Must stay in step with the archives .github/workflows/publish.yaml uploads.
 const TRIPLES = {

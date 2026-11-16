@@ -1,25 +1,32 @@
 #!/bin/bash
+# Install uncomment from the polylint Homebrew tap and smoke-test it.
+# Set TAP_DIR to a local checkout of polylint/homebrew-tap to test an unpublished formula.
 
-set -e
+set -euo pipefail
 
-echo "Testing Homebrew formula locally..."
+tap="polylint/tap"
 
-if ! brew tap | grep -q "goldziher/tap"; then
-  echo "Adding local tap..."
-  brew tap goldziher/tap "$(pwd)/homebrew-tap"
+echo "Testing Homebrew formula..."
+
+if brew tap | grep -qx "$tap"; then
+  brew untap "$tap"
+fi
+if [ -n "${TAP_DIR:-}" ]; then
+  echo "Tapping $tap from local checkout $TAP_DIR..."
+  brew tap "$tap" "$TAP_DIR"
 else
-  echo "Tap already exists, updating..."
-  brew untap goldziher/tap
-  brew tap goldziher/tap "$(pwd)/homebrew-tap"
+  brew tap "$tap"
 fi
 
-echo "Installing uncomment from local tap..."
-brew install --verbose goldziher/tap/uncomment
+echo "Installing uncomment from $tap..."
+brew install --verbose "$tap/uncomment"
 
 echo "Testing uncomment command..."
 uncomment --version
 
-cat >/tmp/test_uncomment.py <<'EOF'
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+cat >"$tmp/test_uncomment.py" <<'EOF'
 # This is a comment
 def hello():
     print("Hello, world!")  # Inline comment
@@ -28,10 +35,10 @@ def hello():
 EOF
 
 echo "Running uncomment on test file..."
-uncomment --dry-run /tmp/test_uncomment.py
+uncomment --dry-run "$tmp/test_uncomment.py"
 
-echo "✅ Homebrew formula test completed successfully!"
+echo "Homebrew formula test completed successfully."
 
 echo "Cleaning up..."
 brew uninstall uncomment
-brew untap goldziher/tap
+brew untap "$tap"

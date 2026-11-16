@@ -14,9 +14,9 @@ line — with parallel processing and a safe dry-run mode.
 AST-accurate&nbsp;·&nbsp;306 languages&nbsp;·&nbsp;zero false positives&nbsp;·&nbsp;tag-comment linting&nbsp;·&nbsp;changed-lines scoping&nbsp;·&nbsp;parallel&nbsp;·&nbsp;dry-run
 
 [![crates.io](https://img.shields.io/crates/v/uncomment?style=flat-square&color=2dd4bf)](https://crates.io/crates/uncomment)
-[![npm](https://img.shields.io/npm/v/uncomment-cli?style=flat-square&color=2dd4bf&label=npm)](https://www.npmjs.com/package/uncomment-cli)
+[![npm](https://img.shields.io/npm/v/@polylint/uncomment?style=flat-square&color=2dd4bf&label=npm)](https://www.npmjs.com/package/@polylint/uncomment)
 [![PyPI](https://img.shields.io/pypi/v/uncomment?style=flat-square&color=2dd4bf)](https://pypi.org/project/uncomment/)
-[![CI](https://img.shields.io/github/actions/workflow/status/Goldziher/uncomment/ci.yml?style=flat-square&label=CI)](https://github.com/Goldziher/uncomment/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/polylint/uncomment/ci.yml?style=flat-square&label=CI)](https://github.com/polylint/uncomment/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2dd4bf?style=flat-square)](./LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-2dd4bf?style=flat-square&logo=github-sponsors)](https://github.com/sponsors/Goldziher)
 
@@ -54,12 +54,13 @@ checks that a TODO or FIXME still points at a live issue key instead of quietly 
 
 ## Installation
 
-| Channel                | Command                                            |
-| ---------------------- | -------------------------------------------------- |
-| Homebrew (macOS/Linux) | `brew tap goldziher/tap && brew install uncomment` |
-| Cargo (Rust)           | `cargo install uncomment`                          |
-| npm (Node.js)          | `pnpm add -g uncomment-cli`                        |
-| pip (Python)           | `pip install uncomment`                            |
+| Channel                | Command                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------- |
+| Homebrew (macOS/Linux) | `brew install polylint/tap/uncomment`                                                           |
+| Scoop (Windows)        | `scoop bucket add polylint https://github.com/polylint/scoop-bucket && scoop install uncomment` |
+| Cargo (Rust)           | `cargo install uncomment`                                                                       |
+| npm (Node.js)          | `npm i -g @polylint/uncomment`                                                                  |
+| pip (Python)           | `pip install uncomment`                                                                         |
 
 Prefer prebuilt binaries? [`cargo binstall uncomment`](https://github.com/cargo-bins/cargo-binstall) downloads a
 release archive instead of compiling from source.
@@ -67,7 +68,7 @@ release archive instead of compiling from source.
 Run without installing:
 
 ```bash
-pnpm dlx uncomment-cli@latest .
+npx @polylint/uncomment .
 uvx uncomment .
 ```
 
@@ -77,7 +78,7 @@ Add `--dry-run` to preview changes before writing.
 <summary><b>Build from source</b></summary>
 
 ```bash
-git clone https://github.com/Goldziher/uncomment.git
+git clone https://github.com/polylint/uncomment.git
 cd uncomment
 cargo install --path .
 ```
@@ -496,10 +497,10 @@ CLI flags are one-directional: `--remove-doc` sets `remove_docs = true` but an u
 
 Every table rejects unknown keys, and a project config that does not parse stops the run instead of degrading to built-in defaults — so a typo such as `enable` for `enabled` in `[lint]` fails every subcommand, not just `lint`.
 
-A JSON Schema for the file is published at [`schema/uncomment.schema.json`](https://github.com/Goldziher/uncomment/blob/main/schema/uncomment.schema.json). `uncomment init` writes a `#:schema` directive at the top of every config it generates, which is what [Taplo](https://taplo.tamasfe.dev/) and the editors built on it read to complete and validate the file as you type. Add the same line to a hand-written config:
+A JSON Schema for the file is published at [`schema/uncomment.schema.json`](https://github.com/polylint/uncomment/blob/main/schema/uncomment.schema.json). `uncomment init` writes a `#:schema` directive at the top of every config it generates, which is what [Taplo](https://taplo.tamasfe.dev/) and the editors built on it read to complete and validate the file as you type. Add the same line to a hand-written config:
 
 ```toml
-#:schema https://raw.githubusercontent.com/Goldziher/uncomment/main/schema/uncomment.schema.json
+#:schema https://raw.githubusercontent.com/polylint/uncomment/main/schema/uncomment.schema.json
 
 [global]
 remove_todos = true
@@ -591,7 +592,7 @@ what to keep, and an **output generator** emits clean code.
 
 ```yaml
 repos:
-  - repo: https://github.com/Goldziher/uncomment
+  - repo: https://github.com/polylint/uncomment
     rev: v3.5.0
     hooks:
       - id: uncomment
@@ -635,14 +636,14 @@ and caches a matching release binary and turns violations into inline PR annotat
 
 ## GitHub Action
 
-`Goldziher/uncomment` ships a composite action that installs a release binary — cached, checksum-verified,
+`polylint/uncomment` ships a composite action that installs a release binary — cached, checksum-verified,
 no compilation — and runs it, with violations reported as inline PR annotations via a
 [problem matcher](https://docs.github.com/en/actions/using-workflows/adding-scripts#adding-a-problem-matcher).
 The binary is self-contained (every tree-sitter grammar is compiled in statically), so nothing about
 it touches the network beyond the one release download.
 
 ```yaml
-- uses: Goldziher/uncomment@v3
+- uses: polylint/uncomment@v3
   with:
     args: "lint ." # or "--check .", or plain removal args
 ```
@@ -658,7 +659,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: Goldziher/uncomment@v3
+      - uses: polylint/uncomment@v3
         with:
           args: "lint ."
 ```
@@ -677,7 +678,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: Goldziher/uncomment@v3
+      - uses: polylint/uncomment@v3
         with:
           args: "lint ."
           changed-lines: "true"
@@ -690,7 +691,7 @@ lint.
 **Install only, and run uncomment yourself:**
 
 ```yaml
-- uses: Goldziher/uncomment@v3
+- uses: polylint/uncomment@v3
   id: uncomment
   with:
     install-only: "true"
@@ -742,14 +743,14 @@ Install the Uncomment CLI separately; these plugins provide no MCP server.
 For Claude Code, add this repository as a marketplace and install its plugin:
 
 ```bash
-claude plugin marketplace add Goldziher/uncomment
+claude plugin marketplace add polylint/uncomment
 claude plugin install uncomment@uncomment
 ```
 
 For Codex:
 
 ```bash
-codex plugin marketplace add Goldziher/uncomment
+codex plugin marketplace add polylint/uncomment
 codex plugin add uncomment@uncomment
 ```
 
@@ -777,6 +778,10 @@ procedures.
 Issues and pull requests are welcome. If uncomment is useful to you, consider
 [sponsoring development](https://github.com/sponsors/Goldziher) — it helps keep the project
 maintained for the community.
+
+## polylint organization
+
+uncomment is part of [polylint](https://github.com/polylint), high-performance Rust linters and formatters built for agentic workflows. Sibling tools: [polylint](https://github.com/polylint/polylint) (one linter and formatter for every language; it can run uncomment as an engine), [skif](https://github.com/polylint/skif) (JS/TS dependency linter), [adrlint](https://github.com/polylint/adrlint) (MADR decision records). Install any of them from the Homebrew tap (`brew tap polylint/tap`) or the Scoop bucket.
 
 ## License
 

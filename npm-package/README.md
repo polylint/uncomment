@@ -1,7 +1,7 @@
-# uncomment-cli
+# @polylint/uncomment
 
-[![npm](https://img.shields.io/npm/v/uncomment-cli?style=flat-square&color=2dd4bf&label=npm)](https://www.npmjs.com/package/uncomment-cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-2dd4bf?style=flat-square)](https://github.com/Goldziher/uncomment/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@polylint/uncomment?style=flat-square&color=2dd4bf&label=npm)](https://www.npmjs.com/package/@polylint/uncomment)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2dd4bf?style=flat-square)](https://github.com/polylint/uncomment/blob/main/LICENSE)
 
 A blazing fast Rust-based command-line tool that removes comments from your source code. Perfect for cleaning up AI-generated code that comes with excessive explanations.
 
@@ -16,8 +16,11 @@ A blazing fast Rust-based command-line tool that removes comments from your sour
 ## Installation
 
 ```bash
-pnpm add -g uncomment-cli
+npm i -g @polylint/uncomment
 ```
+
+Or run it without installing: `npx @polylint/uncomment .`. The installed command is still
+`uncomment`. This package was previously published as `uncomment-cli`, which is deprecated.
 
 The postinstall step downloads the pre-compiled binary for your platform and verifies
 it against the release checksum manifest. Prebuilt archives exist for:
@@ -114,8 +117,12 @@ uncomment --threads 8 entire_project/
 ## Documentation
 
 For detailed documentation, advanced options, and examples, visit:
-[https://github.com/Goldziher/uncomment](https://github.com/Goldziher/uncomment)
+[https://github.com/polylint/uncomment](https://github.com/polylint/uncomment)
+
+## polylint organization
+
+uncomment is part of [polylint](https://github.com/polylint), high-performance Rust linters and formatters built for agentic workflows. Sibling tools: [polylint](https://github.com/polylint/polylint) (one linter and formatter for every language; it can run uncomment as an engine), [skif](https://github.com/polylint/skif) (JS/TS dependency linter), [adrlint](https://github.com/polylint/adrlint) (MADR decision records). Install any of them from the Homebrew tap (`brew tap polylint/tap`) or the Scoop bucket.
 
 ## License
 
-MIT - see [LICENSE](https://github.com/Goldziher/uncomment/blob/main/LICENSE) for details.
+MIT - see [LICENSE](https://github.com/polylint/uncomment/blob/main/LICENSE) for details.

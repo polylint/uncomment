@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/Goldziher/uncomment/main/schema/uncomment.schema.json",
+  "$id": "https://raw.githubusercontent.com/polylint/uncomment/main/schema/uncomment.schema.json",
   "title": "uncomment configuration",
   "description": "Configuration for uncomment, read from `.uncomment.toml`. Every key is optional: a config file states only what it overrides, and a key it omits is inherited from the next config outward or the built-in default. Unknown keys are rejected.",
   "type": "object",

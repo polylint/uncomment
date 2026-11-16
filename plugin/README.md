@@ -9,8 +9,8 @@ export. Edit source files rather than generated manifests or native skills.
 
 ## Installation
 
-- Claude Code: add `Goldziher/uncomment` as a marketplace, then install `uncomment@uncomment`.
-- Codex: `codex plugin marketplace add Goldziher/uncomment`, then `codex plugin add uncomment@uncomment`.
+- Claude Code: add `polylint/uncomment` as a marketplace, then install `uncomment@uncomment`.
+- Codex: `codex plugin marketplace add polylint/uncomment`, then `codex plugin add uncomment@uncomment`.
 - Cursor: use the generated `.cursor-plugin/` manifest and bundled skills, or the release's Cursor team marketplace.
 - OpenCode: load this package's `.opencode/plugins/uncomment.js` with the OpenCode v2 plugin loader.
 - Pi: install the local package directory with `pi install /absolute/path/to/uncomment/plugin`.
@@ -22,6 +22,10 @@ export. Edit source files rather than generated manifests or native skills.
 
 The portable `skills/uncomment/` directory includes its configuration and Rust
 library references. Keep supporting resources together with `SKILL.md`.
+
+## polylint organization
+
+uncomment is part of [polylint](https://github.com/polylint), high-performance Rust linters and formatters built for agentic workflows. Sibling tools: [polylint](https://github.com/polylint/polylint) (one linter and formatter for every language; it can run uncomment as an engine), [skif](https://github.com/polylint/skif) (JS/TS dependency linter), [adrlint](https://github.com/polylint/adrlint) (MADR decision records). Install any of them from the Homebrew tap (`brew tap polylint/tap`) or the Scoop bucket.
 
 ## Verification
 

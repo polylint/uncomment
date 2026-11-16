@@ -4,13 +4,13 @@ name: uncomment
 license: MIT
 metadata:
     author: Goldziher
-    repository: https://github.com/Goldziher/uncomment
+    repository: https://github.com/polylint/uncomment
 ---
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:0c7de78d48b93b3fbba0488c23059fea8b4e0ff49f7c1de07c8c7bbf8a3c24fa
-Source-Hash: blake3:632626448c20c35e5a1201704fa17dabcd59ec395a3e338c62ac5d02b619d20c
+Content-Hash: blake3:f3c7edef56b4624f1b92cfcf67c87d1518bbc80edb4e1b3cd4a5781ae797f0f1
+Source-Hash: blake3:a51aee06b6fd088d9190d50fb95d96bd96d4655d802d0c8a1b2c900d99386042
 Schema-Version: v1
 -->
 
@@ -22,7 +22,7 @@ CLI separately; this plugin provides instructions and has no MCP server.
 
 ```bash
 cargo install uncomment --version '^3.10'
-# Binary wrappers are available as uncomment-cli on npm and uncomment on PyPI.
+# Binary wrappers are available as @polylint/uncomment on npm and uncomment on PyPI.
 uncomment --version
 ```
 

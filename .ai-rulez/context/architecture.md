@@ -43,12 +43,12 @@ grammar loader and nothing is fetched at runtime.
 
 ### Distribution
 
-- `npm-package/` — npm wrapper package (`uncomment-cli`)
+- `npm-package/` — npm wrapper package (`@polylint/uncomment`)
   - `package.json`, `install.js` — Binary download and install
 - `pip-package/` — PyPI wrapper package (`uncomment`)
   - `pyproject.toml`, `uncomment/__init__.py`, `uncomment/downloader.py`
 - `.github/workflows/` — CI/CD and release automation (`publish.yaml` builds cross-platform binaries via a native matrix)
-- `scripts/update-homebrew-formula.sh` — Regenerates the Homebrew formula from release checksums
+- `scripts/publish/` — Homebrew formula and Scoop manifest templates plus their asset maps, rendered by the release workflow
 
 ### Testing
 
