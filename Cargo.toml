@@ -102,3 +102,10 @@ pretty_assertions = "1.4"
 # ~keep only tests/uncomment_integration.rs parses YAML; keep it out of the shipped binary.
 saphyr = "0.3.4"
 tempfile = "3.27.0"
+
+# Release builds favour runtime speed (default opt-level 3, fat LTO, one codegen unit) and drop symbol
+# tables, which only debuggers need, to keep the shipped binaries and packages small. ~keep
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
