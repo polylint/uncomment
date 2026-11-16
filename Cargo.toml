@@ -21,7 +21,6 @@ keywords = ["comments", "cli", "tree-sitter", "ast"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/polylint/uncomment"
-homepage = "https://github.com/polylint/uncomment"
 
 # ~keep cargo-binstall metadata: fetch prebuilt archives from GitHub releases.
 # ~keep archive-suffix resolves to .tar.gz on unix and .zip on windows, matching our release assets.
