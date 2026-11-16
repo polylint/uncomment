@@ -810,7 +810,7 @@ jobs:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [meta, publish-homebrew-formula]
     if: >-
-      !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success'
+      !inputs.plugins-only && !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -858,7 +858,7 @@ jobs:
     name: Merge Homebrew bottle DSL
     needs: [meta, publish-homebrew-formula, homebrew-bottles]
     if: >-
-      !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success' && needs.homebrew-bottles.result == 'success'
+      !inputs.plugins-only && !cancelled() && needs.meta.result == 'success' && needs.publish-homebrew-formula.result == 'success' && needs.homebrew-bottles.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v3
